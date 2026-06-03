@@ -11,7 +11,8 @@
 namespace fs = std::filesystem;
 
 // --- Command Pattern: Interface ---
-class BuiltInCommand {
+class BuiltInCommand 
+{
 public:
     virtual ~BuiltInCommand() = default;
     virtual std::string getName() const = 0;
@@ -19,11 +20,14 @@ public:
 };
 
 // --- Concrete Built-in: cd ---
-class CdCommand : public BuiltInCommand {
+class CdCommand : public BuiltInCommand 
+{
 public:
     std::string getName() const override { return "cd"; }
-    void execute(const std::vector<std::string>& args) override {
-        if (args.size() < 2) {
+    void execute(const std::vector<std::string>& args) override 
+    {
+        if (args.size() < 2) 
+        {
             std::cerr << "cd: missing argument\n";
             return;
         }
@@ -34,33 +38,39 @@ public:
 };
 
 // --- Concrete Built-in: exit ---
-class ExitCommand : public BuiltInCommand {
+class ExitCommand : public BuiltInCommand 
+{
 public:
     std::string getName() const override { return "exit"; }
-    void execute(const std::vector<std::string>& args) override {
+    void execute(const std::vector<std::string>& args) override 
+    {
         std::cout << "Exiting shell...\n";
         exit(0);
     }
 };
 
 // --- The Main Executor ---
-class ShellExecutor {
+class ShellExecutor 
+{
 private:
     // Using a map for O(1) lookup of built-in commands
     std::map<std::string, std::unique_ptr<BuiltInCommand>> builtins;
 
 public:
-    ShellExecutor() {
+    ShellExecutor() 
+    {
         // Register built-in commands
         addCommand(std::make_unique<CdCommand>());
         addCommand(std::make_unique<ExitCommand>());
     }
 
-    void addCommand(std::unique_ptr<BuiltInCommand> cmd) {
+    void addCommand(std::unique_ptr<BuiltInCommand> cmd) 
+    {
         builtins[cmd->getName()] = std::move(cmd);
     }
 
-    void run(const std::string& input) {
+    void run(const std::string& input) 
+    {
         auto args = parse(input);
         if (args.empty()) return;
 
@@ -75,7 +85,8 @@ public:
     }
 
 private:
-    std::vector<std::string> parse(const std::string& input) {
+    std::vector<std::string> parse(const std::string& input) 
+    {
         std::vector<std::string> args;
         std::istringstream iss(input);
         std::string token;
@@ -83,20 +94,26 @@ private:
         return args;
     }
 
-    void executeExternal(const std::vector<std::string>& args) {
+    void executeExternal(const std::vector<std::string>& args) 
+    {
         // Prepare C-style arguments
         std::vector<char*> c_args;
         for (const auto& a : args) c_args.push_back(const_cast<char*>(a.c_str()));
         c_args.push_back(nullptr);
 
-        if (pid_t pid = fork(); pid == -1) {
+        if (pid_t pid = fork(); pid == -1) 
+        {
             perror("fork failed");
-        } else if (pid == 0) {
+        } 
+        else if (pid == 0) 
+        {
             // Child: execvp handles PATH searching automatically
             execvp(c_args[0], c_args.data());
             perror("Execution failed");
             exit(EXIT_FAILURE);
-        } else {
+        } 
+        else 
+        {
             // Parent: Wait
             waitpid(pid, nullptr, 0);
         }
