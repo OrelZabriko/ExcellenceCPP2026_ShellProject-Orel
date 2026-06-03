@@ -53,18 +53,12 @@ public:
 class ShellExecutor 
 {
 private:
-    // Using a map for O(1) lookup of built-in commands
-    std::map<std::string, std::unique_ptr<BuiltInCommand>> builtins;
+    std::unique_ptr<BuiltInCommandContainer> commandContainer;
 
 public:
-    ShellExecutor() 
-    {
-        // Register built-in commands
-        addCommand(std::make_unique<CdCommand>());
-        addCommand(std::make_unique<ExitCommand>());
-    }
+    ShellExecutor() {}
 
-    void addCommand(std::unique_ptr<BuiltInCommand> cmd) 
+    void addCommand(std::unique_ptr<BuiltInCommand> cmd) // move to BuiltInCommandContainer
     {
         builtins[cmd->getName()] = std::move(cmd);
     }

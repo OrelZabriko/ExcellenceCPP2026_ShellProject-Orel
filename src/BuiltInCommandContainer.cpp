@@ -1,25 +1,17 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <memory>
-#include <map>
-#include <filesystem>
-#include <unistd.h>
-#include <sys/wait.h>
+#include "BuiltInCommandContainer.h"
+#include "ShellModel.h"
 
-class ShellModel;
 // --- Command Pattern: Interface ---
 class BuiltInCommand 
 {
 private:
-    ShellModel *model; //change to smart pointer
+    std::unique_ptr<ShellModel> model;
+
 public:
     virtual ~BuiltInCommand() = default;
     virtual std::string getName() const = 0; // identify the command - "cd" "myhistory"
     virtual void execute(const std::vector<std::string>& args) = 0;
     
-    public BuiltInCommand() {} // not needed and illegal
     public BuiltInCommand(ShellModel *theModel) { model = theModel;}
 };
 
